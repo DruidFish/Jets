@@ -45,6 +45,7 @@ int main( int argc, char * argv[] )
 	//double const MODE = -1; //1 for kt, -1 for akt, 0 for c/a
 	double const D = 0.6;
 	double const aD2 = 1.0 / ( D * D );
+	double const TWO_PI = 2.0 * M_PI;
 
 	//Make the jets
 	tick_count const startTime = tick_count::now();
@@ -76,7 +77,8 @@ int main( int argc, char * argv[] )
 				//Pair values
 				double const pairApt = 1.0 / pts[ pairObjectIndex ];
 				double const pairApt2 = pairApt * pairApt;
-				double const deltaPhi = thisPhi - phis[ pairObjectIndex ];
+				double deltaPhi = fabs( thisPhi - phis[ pairObjectIndex ] );
+				if ( deltaPhi > M_PI ) deltaPhi -= TWO_PI;
 				double const deltaRapidity = thisRapidity - rapidities[ pairObjectIndex ];
 				double kt2 = ( ( deltaPhi * deltaPhi ) + ( deltaRapidity * deltaRapidity ) ) * aD2;
 				if ( pairApt2 < thisApt2 )
@@ -146,7 +148,7 @@ int main( int argc, char * argv[] )
 	{
 		if ( outputs[ jetIndex ].Pt() < 5.0 ) break;
 		double phi = outputs[ jetIndex ].Phi();
-		while ( phi < 0.0 ) phi += ( 2.0 * M_PI );
+		while ( phi < 0.0 ) phi += TWO_PI;
 		printf( "%5u %15.8f %15.8f %15.8f\n",
 				jetIndex,
 				outputs[ jetIndex ].Rapidity(),

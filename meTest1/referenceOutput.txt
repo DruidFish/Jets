@@ -1,3 +1,17 @@
+#--------------------------------------------------------------------------
+#                     FastJet release 3.2.1 [fjcore]
+#                 M. Cacciari, G.P. Salam and G. Soyez                  
+#     A software package for jet finding and analysis at colliders      
+#                           http://fastjet.fr                           
+#	                                                                      
+# Please cite EPJC72(2012)1896 [arXiv:1111.6097] if you use this package
+# for scientific work and optionally PLB641(2006)57 [hep-ph/0512210].   
+#                                                                       
+# FastJet is provided without warranty under the terms of the GNU GPLv2.
+# It uses T. Chan's closest pair algorithm, S. Fortune's Voronoi code
+# and 3rd party plugin jet algorithms. See COPYING file for details.
+#--------------------------------------------------------------------------
+Jet finding time: 0.000640215 sec
 Ran Longitudinally invariant anti-kt algorithm with R = 0.6 and E scheme recombination
 jet #        rapidity             phi              pt
     0     -0.86713954      2.90515650    983.27961921
