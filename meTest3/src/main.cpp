@@ -166,8 +166,9 @@ int main( int argc, char * argv[] )
 			etas[ thisMinIndex ] = dummy1.Eta();
 			energies[ thisMinIndex ] = dummy1.E();
 			cachedKts[ thisMinIndex ] = vector< double >( totalObjects, 0.0 );
-			for ( unsigned int cacheIndex = 0; cacheIndex < totalObjects; cacheIndex++ )
+			for ( unsigned int cacheIndex = 0; cacheIndex < thisMinIndex; cacheIndex++ )
 			{
+				//Invalidate caches with lower index than the new merged object
 				cachedKts[ cacheIndex ][ thisMinIndex ] = 0.0;
 			}
 
