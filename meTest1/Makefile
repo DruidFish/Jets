@@ -13,7 +13,8 @@ RM           = rm -f
 AR           = ar cru
 
 ##Flags
-CXXFLAGS     = -O0 -g -fPIC -funroll-loops -DHELLO_BEN# -Wall
+CXXFLAGS     = -O3 -g -fPIC -funroll-loops -Wall -std=c++11
+
 
 EXENAME		= benJet
 SRCEXT   	= cpp
@@ -43,7 +44,7 @@ LINKFLAGS    =
 endif
 
 ##Libraries
-LIBS       += $(ROOTLIBS) -lHtml -lThread
+LIBS       += $(ROOTLIBS) -ltbb
 
 ##Targets
 all : $(EXEDIR)/$(EXENAME)

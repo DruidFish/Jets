@@ -5,9 +5,12 @@
 #include <cstdlib>
 #include <map>
 
+#include "tbb/tick_count.h"
+
 #include "TLorentzVector.h"
 
 using namespace std;
+using namespace tbb;
 
 bool SortJetsByPt( TLorentzVector const& i, TLorentzVector const& j )
 {
@@ -25,23 +28,26 @@ int main( int argc, char * argv[] )
 
 	//Read the fastjet example input
 	double px, py, pz, E;
-	vector< double > phis, rapidities, pts;
+	vector< double > phis, rapidities, pts, energies, etas;
 	while ( cin >> px >> py >> pz >> E )
 	{
 		dummy1.SetPxPyPzE( px, py, pz, E );
 		phis.push_back( dummy1.Phi() );
 		rapidities.push_back( dummy1.Rapidity() );
 		pts.push_back( dummy1.Pt() );
+		energies.push_back( E );
+		etas.push_back( dummy1.Eta() );
 	}
 
 	//kt^2n = pt^2n //for single objects
 	//kt^2n = min( pt^2n ) x delta_R^2 / D^2 //for pairs
 	//Just do akt 0.6
-	double const MODE = -1; //1 for kt, -1 for akt, 0 for c/a
+	//double const MODE = -1; //1 for kt, -1 for akt, 0 for c/a
 	double const D = 0.6;
 	double const aD2 = 1.0 / ( D * D );
 
 	//Loop over all objects
+	tick_count const startTime = tick_count::now();
 	while ( phis.size() )
 	{
 		double kt2Min = DBL_MAX;
@@ -95,29 +101,42 @@ int main( int argc, char * argv[] )
 		//Single objects as min kt are outputs, pairs get merged
 		if ( thisMinIndex == pairMinIndex )
 		{
-			//note rapidity != eta...
+			//Make output TLV
 			outputs.push_back( TLorentzVector() );
-			outputs.back().SetPtEtaPhiM( pts[ thisMinIndex ], rapidities[ thisMinIndex ], phis[ thisMinIndex ], 0.0 );
+			outputs.back().SetPtEtaPhiE( pts[ thisMinIndex ], etas[ thisMinIndex ], phis[ thisMinIndex ], energies[ thisMinIndex ] );
 
+			//Remove jet from active data
 			phis.erase( phis.begin() + thisMinIndex );
 			rapidities.erase( rapidities.begin() + thisMinIndex );
 			pts.erase( pts.begin() + thisMinIndex );
+			etas.erase( etas.begin() + thisMinIndex );
+			energies.erase( energies.begin() + thisMinIndex );
 
 		}
 		else
 		{
-			//note rapidity != eta...
-			dummy1.SetPtEtaPhiM( pts[ thisMinIndex ], rapidities[ thisMinIndex ], phis[ thisMinIndex ], 0.0 );
-			dummy2.SetPtEtaPhiM( pts[ pairMinIndex ], rapidities[ pairMinIndex ], phis[ pairMinIndex ], 0.0 );
+			//Make TLVs for convenience
+			dummy1.SetPtEtaPhiE( pts[ thisMinIndex ], etas[ thisMinIndex ], phis[ thisMinIndex ], energies[ thisMinIndex ] );
+			dummy2.SetPtEtaPhiE( pts[ pairMinIndex ], etas[ pairMinIndex ], phis[ pairMinIndex ], energies[ pairMinIndex ] );
 			dummy1 += dummy2;
+
+			//Replace the original object with the merge
 			pts[ thisMinIndex ] = dummy1.Pt();
 			rapidities[ thisMinIndex ] = dummy1.Rapidity();
 			phis[ thisMinIndex ] = dummy1.Phi();
+			etas[ thisMinIndex ] = dummy1.Eta();
+			energies[ thisMinIndex ] = dummy1.E();
+
+			//Remove the pair object
 			phis.erase( phis.begin() + pairMinIndex );
 			rapidities.erase( rapidities.begin() + pairMinIndex );
 			pts.erase( pts.begin() + pairMinIndex );
+			etas.erase( etas.begin() + pairMinIndex );
+			energies.erase( energies.begin() + pairMinIndex );
 		}
 	}
+	tick_count const endTime = tick_count::now();
+	cout << "Jet finding time: " << ( endTime - startTime ).seconds() << " sec" << endl;
 
 	sort( outputs.begin(), outputs.end(), SortJetsByPt );
 
@@ -126,10 +145,12 @@ int main( int argc, char * argv[] )
 	for ( unsigned int jetIndex = 0; jetIndex < outputs.size(); jetIndex++ )
 	{
 		if ( outputs[ jetIndex ].Pt() < 5.0 ) break;
+		double phi = outputs[ jetIndex ].Phi();
+		while ( phi < 0.0 ) phi += ( 2.0 * M_PI );
 		printf( "%5u %15.8f %15.8f %15.8f\n",
 				jetIndex,
 				outputs[ jetIndex ].Rapidity(),
-				outputs[ jetIndex ].Phi(),
+				phi,
 				outputs[ jetIndex ].Pt() );
 	}
 

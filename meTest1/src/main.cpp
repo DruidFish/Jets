@@ -5,9 +5,12 @@
 #include <cstdlib>
 #include <map>
 
+#include "tbb/tick_count.h"
+
 #include "TLorentzVector.h"
 
 using namespace std;
+using namespace tbb;
 
 bool SortJetsByPt( TLorentzVector const& i, TLorentzVector const& j )
 {
@@ -30,11 +33,12 @@ int main( int argc, char * argv[] )
 	//kt^2n = pt^2n //for single objects
 	//kt^2n = min( pt^2n ) x delta_R^2 / D^2 //for pairs
 	//Just do akt 0.6
-	double const MODE = -1; //1 for kt, -1 for akt, 0 for c/a
+	//double const MODE = -1; //1 for kt, -1 for akt, 0 for c/a
 	double const D = 0.6;
 	double const aD2 = 1.0 / ( D * D );
 
 	//Loop over all objects
+	tick_count const startTime = tick_count::now();
 	while ( inputs.size() )
 	{
 		double kt2Min = DBL_MAX;
@@ -101,6 +105,8 @@ int main( int argc, char * argv[] )
 			inputs.erase( inputs.begin() + pairMinIndex );
 		}
 	}
+	tick_count const endTime = tick_count::now();
+	cout << "Jet finding time: " << ( endTime - startTime ).seconds() << " sec" << endl;
 
 	sort( outputs.begin(), outputs.end(), SortJetsByPt );
 
@@ -109,10 +115,12 @@ int main( int argc, char * argv[] )
 	for ( unsigned int jetIndex = 0; jetIndex < outputs.size(); jetIndex++ )
 	{
 		if ( outputs[ jetIndex ].Pt() < 5.0 ) break;
+		double phi = outputs[ jetIndex ].Phi();
+		while ( phi < 0.0 ) phi += ( 2.0 * M_PI );
 		printf( "%5u %15.8f %15.8f %15.8f\n",
 				jetIndex,
 				outputs[ jetIndex ].Rapidity(),
-				outputs[ jetIndex ].Phi(),
+				phi,
 				outputs[ jetIndex ].Pt() );
 	}
 
