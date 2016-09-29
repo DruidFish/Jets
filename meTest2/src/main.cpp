@@ -46,7 +46,7 @@ int main( int argc, char * argv[] )
 	double const D = 0.6;
 	double const aD2 = 1.0 / ( D * D );
 
-	//Loop over all objects
+	//Make the jets
 	tick_count const startTime = tick_count::now();
 	while ( phis.size() )
 	{
