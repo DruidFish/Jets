@@ -49,12 +49,18 @@ int main( int argc, char * argv[] )
 
 	//Make the jets
 	tick_count const startTime = tick_count::now();
+	tick_count::interval_t findMinKtTime;
+	tick_count::interval_t updateCollectionsTime;
 	while ( phis.size() )
 	{
+		tick_count const startKtTime = tick_count::now();
+
 		double kt2Min = DBL_MAX;
 		unsigned int thisMinIndex = 0;
 		unsigned int pairMinIndex = 0;
 		unsigned int const totalObjects = phis.size();
+
+		//Loop over all input objects
 		for ( unsigned int thisObjectIndex = 0; thisObjectIndex < totalObjects; thisObjectIndex++ )
 		{
 			//Single-object values
@@ -99,8 +105,10 @@ int main( int argc, char * argv[] )
 				}
 			}
 		}
+		findMinKtTime += tick_count::now() - startKtTime;
 
 		//Single objects as min kt are outputs, pairs get merged
+		tick_count const startUpdateTime = tick_count::now();
 		if ( thisMinIndex == pairMinIndex )
 		{
 			//Make output TLV
@@ -136,9 +144,11 @@ int main( int argc, char * argv[] )
 			etas.erase( etas.begin() + pairMinIndex );
 			energies.erase( energies.begin() + pairMinIndex );
 		}
+		updateCollectionsTime += tick_count::now() - startUpdateTime;
 	}
-	tick_count const endTime = tick_count::now();
-	cout << "Jet finding time: " << ( endTime - startTime ).seconds() << " sec" << endl;
+	cout << "Total time: " << ( tick_count::now() - startTime ).seconds() << " sec" << endl;
+	cout << "Kt finding time: " << findMinKtTime.seconds() << " sec" << endl;
+	cout << "Collection update time: " << updateCollectionsTime.seconds() << " sec" << endl;
 
 	sort( outputs.begin(), outputs.end(), SortJetsByPt );
 
