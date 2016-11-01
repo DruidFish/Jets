@@ -13,7 +13,7 @@ RM           = rm -f
 AR           = ar cru
 
 ##Flags
-CXXFLAGS     = -O3 -g -fPIC -funroll-loops -Wall -std=c++11
+CXXFLAGS     = -O0 -g -fPIC -funroll-loops -Wall -std=c++11
 
 
 EXENAME		= benJet

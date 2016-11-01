@@ -42,8 +42,8 @@ int main( int argc, char * argv[] )
 	//Sorting the input pT high to low gives a large speedup
 	sort( inputs.begin(), inputs.end(), SortJetsByPt );
 
-	//Sorting low to high is slightly worse than unsorted - perhaps other way around with kT algo?
-	//sort( inputs.begin(), inputs.end(), SortJetsByPtBack );
+	//Sorting low to high is slightly worse than unsorted - perhaps other way around with kt algo?
+	sort( inputs.begin(), inputs.end(), SortJetsByPtBack );
 
 	//Copy input data into flat arrays
 	unsigned int const totalObjects = inputs.size();
@@ -198,7 +198,7 @@ int main( int argc, char * argv[] )
 	printf("%5s %15s %15s %15s\n","jet #", "rapidity", "phi", "pt");
 	for ( unsigned int jetIndex = 0; jetIndex < outputs.size(); jetIndex++ )
 	{
-		if ( outputs[ jetIndex ].Pt() < 5.0 ) break;
+		if ( outputs[ jetIndex ].Pt() < 0.0 ) break;
 		double phi = outputs[ jetIndex ].Phi();
 		while ( phi < 0.0 ) phi += TWO_PI;
 		printf( "%5u %15.8f %15.8f %15.8f\n",

@@ -122,7 +122,7 @@ int main( int argc, char * argv[] )
 	printf("%5s %15s %15s %15s\n","jet #", "rapidity", "phi", "pt");
 	for ( unsigned int jetIndex = 0; jetIndex < outputs.size(); jetIndex++ )
 	{
-		if ( outputs[ jetIndex ].Pt() < 5.0 ) break;
+		if ( outputs[ jetIndex ].Pt() < 0.0 ) break;
 		double phi = outputs[ jetIndex ].Phi();
 		while ( phi < 0.0 ) phi += TWO_PI;
 		printf( "%5u %15.8f %15.8f %15.8f\n",
